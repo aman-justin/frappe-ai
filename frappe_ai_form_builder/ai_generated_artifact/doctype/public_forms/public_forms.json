@@ -1,0 +1,62 @@
+{
+ "doctype": "DocType",
+ "name": "Public Forms",
+ "module": "ai_generated_artifact",
+ "custom": 0,
+ "fields": [
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "label": "Title",
+   "reqd": 1
+  },
+  {
+   "fieldname": "web_form",
+   "fieldtype": "Link",
+   "label": "Web Form",
+   "options": "Web Form",
+   "reqd": 1
+  },
+  {
+   "fieldname": "route",
+   "fieldtype": "Data",
+   "label": "Route",
+   "read_only": 1
+  },
+  {
+   "fieldname": "visit_link",
+   "fieldtype": "Data",
+   "label": "Visit Link",
+   "read_only": 1
+  },
+  {
+   "fieldname": "submission_count",
+   "fieldtype": "Int",
+   "label": "Total Submissions",
+   "read_only": 1
+  },
+  {
+   "fieldname": "view_submissions",
+   "fieldtype": "HTML",
+   "label": "View Submissions",
+   "read_only": 1
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1
+  },
+  {
+   "role": "Guest",
+   "read": 1
+  }
+ ],
+ "has_web_view": 0,
+ "is_submittable": 0,
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

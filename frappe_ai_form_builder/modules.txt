@@ -1,0 +1,4 @@
+ai_audit_log
+ai_config
+ai_conversation
+ai_generated_artifact

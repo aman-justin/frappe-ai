@@ -1,0 +1,7 @@
+# AI Conversation DocType controller
+
+import frappe
+from frappe.model.document import Document
+
+class AIConversation(Document):
+    pass

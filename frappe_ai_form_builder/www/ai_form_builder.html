@@ -1,0 +1,2038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Form Builder</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        .ai-form-builder-container {
+            width: 100%;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        .ai-chat-container {
+            background: white;
+            border-radius: 0;
+            box-shadow: none;
+            border: none;
+            overflow: hidden;
+            display: flex;
+            height: 100%;
+            width: 100%;
+        }
+
+        .chat-section {
+            flex: 1;
+            border-right: 1px solid #f3f4f6;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        .preview-section {
+            flex: 1;
+            background: #fafafa;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        .ai-chat-header {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border-bottom: 1px solid #e5e7eb;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .ai-chat-header-content {
+            flex: 1;
+        }
+
+        .ai-chat-header-actions {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .btn-rollback {
+            background: #f3f4f6;
+            color: #374151;
+            border: 1px solid #d1d5db;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-templates {
+            background: #f3f4f6;
+            color: #374151;
+            border: 1px solid #d1d5db;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-right: 0.5rem;
+        }
+
+        .btn-templates:hover {
+            background: #e5e7eb;
+            border-color: #9ca3af;
+        }
+
+        .btn-rollback:hover {
+            background: #e5e7eb;
+            border-color: #9ca3af;
+        }
+
+        .btn-rollback:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .ai-chat-header h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #000000 0%, #374151 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.025em;
+        }
+
+        .ai-chat-header p {
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin: 0;
+            font-weight: 400;
+        }
+
+        .preview-header {
+            background: linear-gradient(135deg, #fafafa 0%, #f3f4f6 100%);
+            border-bottom: 1px solid #e5e7eb;
+            padding: 1.5rem 2rem;
+            border-radius: 0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .preview-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 0.25rem;
+            letter-spacing: -0.025em;
+        }
+
+        .preview-header p {
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin: 0;
+            font-weight: 400;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+            background: #fafafa;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        body:not(.prompts-hidden) .chat-messages {
+            flex: 0;
+            min-height: 0;
+            max-height: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .form-preview {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+            background: #fafafa;
+            min-height: 0;
+        }
+
+        .message {
+            margin-bottom: 2rem;
+            display: flex;
+            animation: messageSlideIn 0.4s ease-out;
+        }
+
+        @keyframes messageSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+            margin-right: 1rem;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .message.ai .message-avatar {
+            background: linear-gradient(135deg, #000000 0%, #1f2937 100%);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .message.ai .message-avatar::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .message.user .message-avatar {
+            background: #f3f4f6;
+            color: #374151;
+            border: 1px solid #e5e7eb;
+        }
+
+        .message-content {
+            max-width: 75%;
+            padding: 1.25rem 1.5rem;
+            border-radius: 16px;
+            word-wrap: break-word;
+            font-size: 0.875rem;
+            line-height: 1.6;
+            font-weight: 400;
+        }
+
+        .message.ai {
+            position: relative;
+        }
+        
+        .message.ai .message-content {
+            background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .message-rollback-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #e5e7eb;
+            color: #6b7280;
+            font-size: 12px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .message.user .message-rollback-btn {
+            right: auto;
+            left: 8px;
+        }
+
+        .message.user:hover .message-rollback-btn {
+            display: flex;
+        }
+
+        .message-rollback-btn:hover {
+            background: #f3f4f6;
+            border-color: #d1d5db;
+            color: #374151;
+            transform: scale(1.1);
+        }
+
+        .message-rollback-btn:active {
+            transform: scale(0.95);
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, #000000 0%, #1f2937 100%);
+            color: white;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .message.user .message-avatar {
+            margin-right: 0;
+            margin-left: 0.75rem;
+        }
+
+        .input-section {
+            border-top: 1px solid #f3f4f6;
+            padding: 2rem;
+            background: white;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-end;
+        }
+
+        .form-control {
+            flex: 1;
+            border: 1px solid #d1d5db;
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            font-size: 0.875rem;
+            background: #f9fafb;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        .form-control:focus {
+            border-color: #000000;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-textarea {
+            resize: vertical;
+            min-height: 3rem;
+            max-height: 8rem;
+            line-height: 1.5;
+        }
+
+        .form-control::placeholder {
+            color: #9ca3af;
+        }
+
+        .btn {
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            vertical-align: middle;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #000000 0%, #1f2937 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-success {
+            background: #000000;
+            border-color: #000000;
+            color: white;
+            display: none; /* Hidden by default */
+        }
+
+        .btn-success:hover:not(:disabled) {
+            background: #1f2937;
+            border-color: #1f2937;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        .loading-indicator {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+            color: #6b7280;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .loading-indicator::after {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: #6b7280;
+            animation: loadingDots 1.4s ease-in-out infinite both;
+            margin-left: 8px;
+        }
+
+        .loading-indicator::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: #6b7280;
+            animation: loadingDots 1.4s ease-in-out 0.16s infinite both;
+            margin-right: 8px;
+        }
+
+        @keyframes loadingDots {
+            0%, 80%, 100% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .form-preview-field {
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+            border-radius: 12px;
+            padding: 1.25rem;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s ease;
+        }
+        
+        .form-preview-field:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+            border-color: #d1d5db;
+        }
+
+        .form-preview-field.required .field-label::after {
+            content: ' *';
+            color: #ef4444;
+            font-weight: 600;
+        }
+
+        .field-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+
+        .field-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            background: white;
+            transition: border-color 0.2s ease;
+            box-sizing: border-box;
+        }
+
+        .field-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .field-textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .rating-stars {
+            user-select: none;
+        }
+
+        .rating-stars .star:hover,
+        .rating-stars .star.active {
+            color: #fbbf24 !important;
+        }
+
+        .rating-stars .star:hover ~ .star {
+            color: #d1d5db !important;
+        }
+
+        .field-input[type="range"] {
+            padding: 0;
+            height: 6px;
+            background: #d1d5db;
+            border-radius: 3px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .field-input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+        }
+
+        .field-input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            border: none;
+        }
+
+        /* Table styling */
+        .form-preview-field table {
+            margin: 0;
+        }
+
+        .form-preview-field th {
+            background: #f9fafb !important;
+            font-weight: 600 !important;
+            color: #374151 !important;
+            border-bottom: 1px solid #e5e7eb !important;
+        }
+
+        .form-preview-field td {
+            border-bottom: 1px solid #f3f4f6 !important;
+        }
+
+        .form-preview-field td input {
+            border: none !important;
+            outline: none !important;
+            background: transparent !important;
+            padding: 0 !important;
+            font-size: 0.875rem !important;
+        }
+
+        /* Signature pad styling */
+        .form-preview-field canvas {
+            border: 1px solid #e5e7eb !important;
+            border-radius: 4px !important;
+            background: white !important;
+        }
+
+        /* Rich text editor styling */
+        .form-preview-field [contenteditable] {
+            border: 1px solid #d1d5db !important;
+            border-radius: 6px !important;
+            padding: 0.75rem !important;
+            background: white !important;
+            min-height: 120px !important;
+            font-family: inherit !important;
+            font-size: 0.875rem !important;
+            line-height: 1.6 !important;
+            outline: none !important;
+        }
+
+        .form-preview-field [contenteditable]:focus {
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+        }
+
+        .form-preview-field [contenteditable]:empty:before {
+            content: attr(placeholder) !important;
+            color: #9ca3af !important;
+            pointer-events: none !important;
+        }
+
+        .field-select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+        }
+
+        .preview-empty {
+            text-align: center;
+            color: #6b7280;
+            padding: 3rem 2rem;
+            font-size: 0.875rem;
+        }
+
+        .preview-empty .preview-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            color: #9ca3af;
+            opacity: 0.6;
+        }
+
+        .success-message {
+            background: #f0fdf4;
+            color: #166534;
+            padding: 1.25rem 1.5rem;
+            border-radius: 12px;
+            margin: 1rem 0;
+            border: 1px solid #bbf7d0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .success-message strong {
+            color: #166534;
+        }
+
+        /* Scrollbar styling */
+        .chat-messages::-webkit-scrollbar,
+        .form-preview::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track,
+        .form-preview::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 3px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb,
+        .form-preview::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb:hover,
+        .form-preview::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .spec-preview {
+            display: none !important;
+        }
+        
+        .spec-preview::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .spec-preview::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 2px;
+        }
+
+        .spec-preview::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 2px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1024px) {
+            .ai-chat-container {
+                flex-direction: column;
+                min-height: 100vh;
+            }
+
+            .chat-section {
+                border-right: none;
+                border-bottom: 1px solid #f3f4f6;
+                flex: 1;
+            }
+
+            .preview-section {
+                flex: 1;
+                max-height: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .ai-chat-header,
+            .preview-header {
+                padding: 1rem 1.5rem;
+            }
+
+            .chat-messages,
+            .form-preview {
+                padding: 1rem;
+            }
+
+            .message-content {
+                max-width: 85%;
+                padding: 1rem 1.25rem;
+            }
+
+            .input-section {
+                padding: 1rem;
+            }
+
+            .input-group {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            .btn {
+                width: 100%;
+                padding: 1rem;
+            }
+
+            .preview-empty {
+                padding: 2rem 1rem;
+            }
+        }
+
+        /* Focus states for accessibility */
+        .btn:focus {
+            outline: 2px solid #000000;
+            outline-offset: 2px;
+        }
+
+        .form-control:focus {
+            outline: 2px solid #000000;
+            outline-offset: 2px;
+        }
+
+        /* Predefined Prompts Styles */
+        .prompts-section {
+            border-bottom: 1px solid #f3f4f6;
+            background: #fafafa;
+            padding: 2rem;
+            overflow-y: auto;
+            max-height: 70vh;
+        }
+
+        .prompts-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .prompts-header h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 0.5rem;
+        }
+
+        .prompts-header p {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+
+        /* Custom Prompt Input Styles */
+        .custom-prompt-section {
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .custom-prompt-input-group {
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-end;
+        }
+
+        .custom-prompt-input {
+            flex: 1;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-size: 0.875rem;
+            background: #f9fafb;
+            transition: all 0.2s ease;
+            outline: none;
+            min-height: 120px;
+            resize: vertical;
+            font-family: inherit;
+            line-height: 1.5;
+        }
+
+        .custom-prompt-input:focus {
+            border-color: #000000;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .custom-prompt-input::placeholder {
+            color: #9ca3af;
+        }
+
+        .btn-custom-send {
+            background: linear-gradient(135deg, #000000 0%, #1f2937 100%);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 48px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-custom-send::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .btn-custom-send:hover::after {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-custom-send:hover:not(:disabled) {
+            background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+        }
+
+        .btn-custom-send:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .prompts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .prompt-category {
+            background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+        
+        .prompt-category:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            border-color: #d1d5db;
+        }
+
+        .prompt-category h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .prompt-buttons {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+
+        .prompt-btn {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #475569;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease;
+            line-height: 1.4;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .prompt-btn i {
+            opacity: 0.7;
+            transition: opacity 0.2s ease;
+        }
+        
+        .prompt-btn:hover i {
+            opacity: 1;
+        }
+
+        .prompt-btn:hover {
+            background: linear-gradient(135deg, #000000 0%, #1f2937 100%);
+            border-color: #000000;
+            color: white;
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .custom-prompt-btn {
+            border-style: dashed;
+            background: #fefefe;
+            color: #64748b;
+        }
+
+        .custom-prompt-btn:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+            color: #334155;
+        }
+
+        /* Hide prompts after conversation starts */
+        .prompts-hidden .prompts-section {
+            display: none;
+        }
+
+        .prompts-hidden .chat-messages {
+            padding-top: 2rem;
+        }
+        
+        /* Hide welcome message when prompts are visible */
+        body:not(.prompts-hidden) .chat-messages .message:first-child {
+            display: none;
+        }
+
+        .prompts-hidden #templatesBtn {
+            background: linear-gradient(135deg, #000000 0%, #1f2937 100%);
+            color: white;
+            border-color: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body class="prompts-hidden">
+    <div class="ai-form-builder-container">
+        <div class="ai-chat-container">
+            <!-- Chat Section (Left) -->
+            <div class="chat-section">
+                <div class="ai-chat-header">
+                    <div class="ai-chat-header-content">
+                        <h1><i class="fas fa-brain"></i> AI Form Builder</h1>
+                        <p>Intelligent form creation powered by artificial intelligence</p>
+                    </div>
+                    <div class="ai-chat-header-actions">
+                        <button class="btn-templates" id="templatesBtn" onclick="togglePrompts()" title="Show Templates">
+                            <i class="fas fa-layer-group"></i> Templates
+                        </button>
+                        <button class="btn-rollback" onclick="clearChat()" title="Clear Chat">
+                            <i class="fas fa-trash-alt"></i> Clear
+                        </button>
+                        <button class="btn-rollback" id="rollbackBtn" onclick="rollbackConversation()" disabled>
+                            <i class="fas fa-undo"></i> Rollback
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Predefined Prompts Section -->
+                <div class="prompts-section" id="promptsSection">
+                    <div class="prompts-header">
+                        <h3><i class="fas fa-rocket"></i> Quick Start Templates</h3>
+                        <p>Choose a template or describe your custom form idea</p>
+                    </div>
+
+                    <!-- Custom Prompt Input -->
+                    <div class="custom-prompt-section">
+                        <div class="custom-prompt-input-group">
+                            <textarea
+                                class="custom-prompt-input"
+                                id="customPromptInput"
+                                placeholder="Describe your custom form requirements... (Shift+Enter for new line)"
+                                rows="4"
+                            ></textarea>
+                            <button class="btn-custom-send" onclick="sendCustomPrompt()" title="Send Custom Prompt">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="prompts-grid">
+                        <!-- HR Templates -->
+                        <div class="prompt-category">
+                            <h4>👥 Human Resources</h4>
+                            <div class="prompt-buttons">
+                                <button class="prompt-btn" onclick="usePrompt('Create an employee onboarding form with fields for personal information, job details, emergency contacts, and required documents')">
+                                    Employee Onboarding
+                                </button>
+                                <button class="prompt-btn" onclick="usePrompt('Create a performance review form with rating scales, goal tracking, and feedback sections')">
+                                    Performance Review
+                                </button>
+                                <button class="prompt-btn" onclick="usePrompt('Create a leave request form with date pickers, leave types, and approval workflow')">
+                                    Leave Request
+                                </button>
+                                <button class="prompt-btn" onclick="usePrompt('Create an employee exit interview form with satisfaction ratings and feedback fields')">
+                                    Exit Interview
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- CRM Templates -->
+                        <div class="prompt-category">
+                            <h4>🎯 Customer Relationship</h4>
+                            <div class="prompt-buttons">
+                                <button class="prompt-btn" onclick="usePrompt('Create a customer registration form with contact details, company information, and preferences')">
+                                    Customer Registration
+                                </button>
+                                <button class="prompt-btn" onclick="usePrompt('Create a lead qualification form with scoring criteria and follow-up actions')">
+                                    Lead Qualification
+                                </button>
+                                <button class="prompt-btn" onclick="usePrompt('Create a customer feedback survey with rating scales and comment fields')">
+                                    Customer Feedback
+                                </button>
+                                <button class="prompt-btn" onclick="usePrompt('Create a sales opportunity form with deal size, probability, and timeline tracking')">
+                                    Sales Opportunity
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Inventory Templates -->
+                        <div class="prompt-category">
+                            <h4>📦 Inventory Management</h4>
+                            <div class="prompt-buttons">
+                                <button class="prompt-btn" onclick="usePrompt('Create a product catalog form with specifications, pricing, and image uploads')">
+                                    Product Catalog
+                                </button>
+                                <button class="prompt-btn" onclick="usePrompt('Create an inventory adjustment form with stock levels, reasons, and approval workflow')">
+                                    Stock Adjustment
+                                </button>
+                                <button class="prompt-btn" onclick="usePrompt('Create a purchase order form with vendor details, item lists, and approval routing')">
+                                    Purchase Order
+                                </button>
+                                <button class="prompt-btn" onclick="usePrompt('Create a warehouse transfer form with source/destination tracking and item details')">
+                                    Warehouse Transfer
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Project Management Templates -->
+                        <div class="prompt-category">
+                            <h4>📋 Project Management</h4>
+                            <div class="prompt-buttons">
+                                <button class="prompt-btn" onclick="usePrompt('Create a project initiation form with objectives, stakeholders, and resource requirements')">
+                                    Project Initiation
+                                </button>
+                                <button class="prompt-btn" onclick="usePrompt('Create a task management form with priorities, assignments, and progress tracking')">
+                                    Task Management
+                                </button>
+                                <button class="prompt-btn" onclick="usePrompt('Create a project milestone form with deliverables, deadlines, and status updates')">
+                                    Project Milestones
+                                </button>
+                                <button class="prompt-btn" onclick="usePrompt('Create a risk assessment form with impact levels and mitigation strategies')">
+                                    Risk Assessment
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Custom Template -->
+                        <div class="prompt-category">
+                            <h4>🎨 More Templates</h4>
+                            <div class="prompt-buttons">
+                                <button class="prompt-btn" onclick="usePrompt('Create a contact form with name, email, phone, and message fields')">
+                                    Basic Contact Form
+                                </button>
+                                <button class="prompt-btn" onclick="usePrompt('Create an event registration form with attendee details and session preferences')">
+                                    Event Registration
+                                </button>
+                                <button class="prompt-btn" onclick="usePrompt('Create a survey form with multiple choice questions and rating scales')">
+                                    General Survey
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-messages" id="chatContainer">
+                    <div class="message ai">
+                        <div class="message-avatar">AI</div>
+                        <div class="message-content">
+                            <div style="margin-bottom: 1rem;">
+                                <strong style="font-size: 1.1rem; color: #111827;">Welcome to AI Form Builder</strong>
+                            </div>
+                            <p style="margin-bottom: 1rem; color: #4b5563;">I'm here to help you create professional forms through natural conversation. Simply describe what you need, and I'll build it for you.</p>
+                            
+                            <div style="background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%); border-left: 3px solid #000000; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+                                <strong style="display: block; margin-bottom: 0.75rem; color: #374151; font-size: 0.875rem;">
+                                    <i class="fas fa-lightbulb" style="color: #f59e0b; margin-right: 0.5rem;"></i>Try these examples:
+                                </strong>
+                                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                    <div style="display: flex; align-items: start; gap: 0.5rem;">
+                                        <i class="fas fa-quote-left" style="color: #9ca3af; font-size: 0.7rem; margin-top: 0.25rem;"></i>
+                                        <span style="color: #6b7280; font-style: italic;">Create a customer feedback form with rating scales</span>
+                                    </div>
+                                    <div style="display: flex; align-items: start; gap: 0.5rem;">
+                                        <i class="fas fa-quote-left" style="color: #9ca3af; font-size: 0.7rem; margin-top: 0.25rem;"></i>
+                                        <span style="color: #6b7280; font-style: italic;">Build an employee onboarding form with document uploads</span>
+                                    </div>
+                                    <div style="display: flex; align-items: start; gap: 0.5rem;">
+                                        <i class="fas fa-quote-left" style="color: #9ca3af; font-size: 0.7rem; margin-top: 0.25rem;"></i>
+                                        <span style="color: #6b7280; font-style: italic;">Design a project tracking form with milestones</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <p style="margin-top: 1rem; color: #6b7280; font-size: 0.875rem;">
+                                <i class="fas fa-arrow-right" style="color: #000000; margin-right: 0.5rem;"></i>What would you like to create today?
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="loading-indicator" id="loading">AI is thinking</div>
+
+                <div class="input-section">
+                    <div class="input-group">
+                        <textarea
+                            class="form-control chat-textarea"
+                            id="userInput"
+                            placeholder="Describe your form... (Shift+Enter for new line, Enter to send)"
+                            autocomplete="off"
+                            rows="3"
+                        ></textarea>
+                        <button class="btn btn-primary" id="sendBtn" onclick="sendMessage()">Send</button>
+                        <button class="btn btn-success" id="generateBtn" onclick="generateDocType()">✨ Create Form</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preview Section (Right) -->
+            <div class="preview-section">
+                <div class="preview-header">
+                    <h2><i class="fas fa-eye"></i> Live Preview</h2>
+                    <p>Real-time visualization of your form</p>
+                </div>
+
+                <div class="form-preview" id="formPreview">
+                    <div class="preview-empty">
+                        <div class="preview-icon">📝</div>
+                        <p>Your form preview will appear here as you chat with the AI.</p>
+                        <p>Start describing your form to see it take shape!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let sessionId = null;
+        let readyToGenerate = false;
+        let conversationHistory = []; // Store conversation snapshots
+        let currentHistoryIndex = -1;
+        let currentSpec = null; // Current form specification
+        
+        // CSRF Token from server
+        const csrfToken = '{{ csrf_token }}';
+        
+        // Start session on load
+        window.onload = async function() {
+            try {
+                const response = await fetch('/api/method/frappe_ai_form_builder.api.session.start_session', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Frappe-CSRF-Token': csrfToken
+                    }
+                });
+                const data = await response.json();
+                if (data.message) {
+                    sessionId = data.message.session_id;
+                    // Initialize empty preview
+                    renderFormPreview(null);
+                    saveConversationSnapshot(currentSpec);
+                }
+            } catch (error) {
+                console.error('Failed to start session:', error);
+                addMessage('ai', 'Sorry, failed to start session. Please refresh the page.');
+            }
+        };
+        
+        // Predefined prompts functionality
+        function usePrompt(promptText) {
+            const input = document.getElementById('userInput');
+            input.value = promptText;
+            
+            // Hide prompts section
+            document.body.classList.add('prompts-hidden');
+            
+            // Send the message
+            sendMessage();
+        }
+        
+        function sendCustomPrompt() {
+            const customInput = document.getElementById('customPromptInput');
+            const promptText = customInput.value.trim();
+            
+            if (!promptText) {
+                customInput.focus();
+                return;
+            }
+            
+            // Use the existing usePrompt function
+            usePrompt(promptText);
+            
+            // Clear the custom input
+            customInput.value = '';
+        }
+        
+        function showCustomPrompt() {
+            const customPrompt = prompt('Enter your custom prompt:');
+            if (customPrompt && customPrompt.trim()) {
+                usePrompt(customPrompt.trim());
+            }
+        }
+        
+        function clearChat() {
+            if (confirm('Are you sure you want to clear the chat? This will start a new session.')) {
+                location.reload();
+            }
+        }
+        
+        function createNewForm() {
+            location.reload();
+        }
+        
+        function togglePrompts() {
+            const body = document.body;
+            const btn = document.getElementById('templatesBtn');
+            
+            if (body.classList.contains('prompts-hidden')) {
+                body.classList.remove('prompts-hidden');
+                btn.innerHTML = '<i class="fas fa-layer-group"></i> Templates';
+                btn.title = 'Hide Templates';
+            } else {
+                body.classList.add('prompts-hidden');
+                btn.innerHTML = '<i class="fas fa-layer-group"></i> Show Templates';
+                btn.title = 'Show Templates';
+            }
+        }
+        
+        // Handle rating star interactions
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('star')) {
+                const rating = parseInt(e.target.dataset.rating);
+                const stars = e.target.parentElement.querySelectorAll('.star');
+                
+                stars.forEach((star, index) => {
+                    if (index < rating) {
+                        star.classList.add('active');
+                        star.textContent = '★';
+                    } else {
+                        star.classList.remove('active');
+                        star.textContent = '☆';
+                    }
+                });
+            }
+        });
+
+        // Handle rating star hover effects
+        document.addEventListener('mouseover', function(e) {
+            if (e.target.classList.contains('star')) {
+                const rating = parseInt(e.target.dataset.rating);
+                const stars = e.target.parentElement.querySelectorAll('.star');
+                
+                stars.forEach((star, index) => {
+                    if (index < rating) {
+                        star.style.color = '#fbbf24';
+                    } else {
+                        star.style.color = '#d1d5db';
+                    }
+                });
+            }
+        });
+
+        document.addEventListener('mouseout', function(e) {
+            if (e.target.classList.contains('star')) {
+                const stars = e.target.parentElement.querySelectorAll('.star');
+                stars.forEach(star => {
+                    star.style.color = star.classList.contains('active') ? '#fbbf24' : '#d1d5db';
+                });
+            }
+        });
+
+        // Geolocation helper
+        function getCurrentLocation(button) {
+            if (navigator.geolocation) {
+                button.textContent = 'Getting...';
+                button.disabled = true;
+                
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        const inputs = button.parentElement.querySelectorAll('input');
+                        inputs[0].value = position.coords.latitude.toFixed(6);
+                        inputs[1].value = position.coords.longitude.toFixed(6);
+                        button.textContent = '📍 Get Location';
+                        button.disabled = false;
+                    },
+                    function(error) {
+                        console.error('Geolocation error:', error);
+                        button.textContent = '❌ Failed';
+                        setTimeout(() => {
+                            button.textContent = '📍 Get Location';
+                            button.disabled = false;
+                        }, 2000);
+                    }
+                );
+            } else {
+                alert('Geolocation is not supported by this browser.');
+            }
+        }
+
+        // Table row management
+        function addTableRow(button) {
+            const tbody = button.closest('tbody');
+            const columns = tbody.querySelector('tr').querySelectorAll('td').length - 1; // -1 for the remove button column
+            
+            const newRow = document.createElement('tr');
+            for (let i = 0; i < columns; i++) {
+                const cell = document.createElement('td');
+                cell.style.padding = '0.75rem';
+                cell.style.borderBottom = '1px solid #f3f4f6';
+                cell.innerHTML = '<input type="text" style="width: 100%; border: none; outline: none; background: transparent;">';
+                newRow.appendChild(cell);
+            }
+            
+            const actionCell = document.createElement('td');
+            actionCell.style.padding = '0.75rem';
+            actionCell.style.textAlign = 'center';
+            actionCell.innerHTML = '<button type="button" onclick="removeTableRow(this)" style="font-size: 0.75rem; color: #ef4444;">×</button>';
+            newRow.appendChild(actionCell);
+            
+            tbody.appendChild(newRow);
+        }
+
+        function removeTableRow(button) {
+            const row = button.closest('tr');
+            const tbody = row.closest('tbody');
+            
+            // Don't remove if it's the last row
+            if (tbody.querySelectorAll('tr').length > 1) {
+                row.remove();
+            }
+        }
+
+        // Signature pad functionality
+        function clearSignature(button) {
+            const canvas = button.closest('.form-preview-field').querySelector('canvas');
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+        }
+
+        // Handle textarea key events (Enter to send, Shift+Enter for new line)
+        document.getElementById('userInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                if (e.shiftKey) {
+                    // Shift+Enter: allow new line
+                    return;
+                } else {
+                    // Enter: send message
+                    e.preventDefault();
+                    sendMessage();
+                }
+            }
+        });
+
+        // Handle custom prompt input key events
+        document.getElementById('customPromptInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                if (e.shiftKey) {
+                    // Shift+Enter: allow new line
+                    return;
+                } else {
+                    // Enter: send message
+                    e.preventDefault();
+                    sendCustomPrompt();
+                }
+            }
+        });
+
+        function saveConversationSnapshot(spec) {
+            // Save a snapshot of the current conversation state
+            const messages = Array.from(document.querySelectorAll('.message')).map(msg => ({
+                type: msg.classList.contains('ai') ? 'ai' : 'user',
+                content: msg.querySelector('.message-content').innerHTML,
+                hasSpec: !!msg.querySelector('.spec-preview')
+            }));
+            
+            const snapshot = {
+                messages: messages,
+                spec: spec ? JSON.parse(JSON.stringify(spec)) : null, // Deep copy
+                timestamp: new Date().toISOString()
+            };
+            
+            conversationHistory.push(snapshot);
+            currentHistoryIndex = conversationHistory.length - 1;
+            
+            // Enable rollback button if we have history
+            updateRollbackButton();
+        }
+        
+        function rollbackConversation() {
+            if (currentHistoryIndex <= 0) return;
+            
+            // Move to previous snapshot
+            currentHistoryIndex--;
+            
+            const snapshot = conversationHistory[currentHistoryIndex];
+            
+            // Restore messages
+            const chatContainer = document.getElementById('chatContainer');
+            chatContainer.innerHTML = '';
+            
+            snapshot.messages.forEach(msgData => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${msgData.type}`;
+                
+                const avatar = document.createElement('div');
+                avatar.className = 'message-avatar';
+                avatar.textContent = msgData.type === 'ai' ? 'AI' : 'You';
+                
+                const messageContent = document.createElement('div');
+                messageContent.className = 'message-content';
+                messageContent.innerHTML = msgData.content;
+                
+                if (msgData.type === 'ai') {
+                    // Add rollback button for AI messages
+                    const rollbackBtn = document.createElement('button');
+                    rollbackBtn.className = 'message-rollback-btn';
+                    rollbackBtn.innerHTML = '↶';
+                    rollbackBtn.title = 'Rollback to this point';
+                    rollbackBtn.onclick = () => rollbackToMessage(messageDiv);
+                    messageDiv.appendChild(rollbackBtn);
+                    
+                    messageDiv.appendChild(avatar);
+                    messageDiv.appendChild(messageContent);
+                } else {
+                    messageDiv.appendChild(messageContent);
+                    messageDiv.appendChild(avatar);
+                }
+                
+                chatContainer.appendChild(messageDiv);
+            });
+            
+            // Restore form preview
+            renderFormPreview(snapshot.spec);
+            
+            // Update rollback button
+            updateRollbackButton();
+            
+            // Show rollback confirmation
+            addMessage('ai', `🔄 **Rolled back to previous state**<br><br>Form specification restored from ${new Date(snapshot.timestamp).toLocaleString()}`);
+        }
+        
+        function updateRollbackButton() {
+            const rollbackBtn = document.getElementById('rollbackBtn');
+            const canRollback = currentHistoryIndex > 0;
+            
+            rollbackBtn.disabled = !canRollback;
+            rollbackBtn.textContent = canRollback ? `↶ Rollback (${currentHistoryIndex})` : '↶ Rollback';
+        }
+        
+        function rollbackToMessage(messageElement) {
+            // Find the index of this message in the conversation history
+            const allMessages = Array.from(document.querySelectorAll('.message'));
+            const messageIndex = allMessages.indexOf(messageElement);
+            
+            if (messageIndex === -1) return;
+            
+            // Find the most recent snapshot that includes this message
+            let targetSnapshotIndex = -1;
+            for (let i = conversationHistory.length - 1; i >= 0; i--) {
+                const snapshot = conversationHistory[i];
+                // Check if this snapshot has at least as many messages as our target
+                if (snapshot.messages.length >= messageIndex + 1) {
+                    targetSnapshotIndex = i;
+                    break;
+                }
+            }
+            
+            if (targetSnapshotIndex === -1 || targetSnapshotIndex >= conversationHistory.length) return;
+            
+            // Rollback to the found snapshot
+            currentHistoryIndex = targetSnapshotIndex;
+            const snapshot = conversationHistory[currentHistoryIndex];
+            
+            // Restore messages up to this point
+            const chatContainer = document.getElementById('chatContainer');
+            chatContainer.innerHTML = '';
+            
+            snapshot.messages.forEach(msgData => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${msgData.type}`;
+                
+                const avatar = document.createElement('div');
+                avatar.className = 'message-avatar';
+                avatar.textContent = msgData.type === 'ai' ? 'AI' : 'You';
+                
+                const messageContent = document.createElement('div');
+                messageContent.className = 'message-content';
+                messageContent.innerHTML = msgData.content;
+                
+                if (msgData.type === 'ai') {
+                    // Add rollback button for AI messages
+                    const rollbackBtn = document.createElement('button');
+                    rollbackBtn.className = 'message-rollback-btn';
+                    rollbackBtn.innerHTML = '↶';
+                    rollbackBtn.title = 'Rollback to this point';
+                    rollbackBtn.onclick = () => rollbackToMessage(messageDiv);
+                    messageDiv.appendChild(rollbackBtn);
+                    
+                    messageDiv.appendChild(avatar);
+                    messageDiv.appendChild(messageContent);
+                } else {
+                    messageDiv.appendChild(messageContent);
+                    messageDiv.appendChild(avatar);
+                }
+                
+                chatContainer.appendChild(messageDiv);
+            });
+            
+            // Restore form preview
+            renderFormPreview(snapshot.spec);
+            
+            // Update rollback button
+            updateRollbackButton();
+            
+            // Show rollback confirmation
+            addMessage('ai', `🔄 **Rolled back to this message**<br><br>Form specification restored from ${new Date(snapshot.timestamp).toLocaleString()}`);
+        }
+        
+        function addMessage(type, content, spec = null) {
+            const chatContainer = document.getElementById('chatContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.textContent = type === 'ai' ? 'AI' : 'You';
+            
+            const messageContent = document.createElement('div');
+            messageContent.className = 'message-content';
+            messageContent.innerHTML = content.replace(/\n/g, '<br>');
+            
+            if (spec) {
+                const specPreview = document.createElement('div');
+                specPreview.className = 'spec-preview';
+                specPreview.textContent = JSON.stringify(spec, null, 2);
+                messageContent.appendChild(specPreview);
+                
+                // Update live preview
+                renderFormPreview(spec);
+            }
+            
+            if (type === 'ai') {
+                // Add rollback button for AI messages
+                const rollbackBtn = document.createElement('button');
+                rollbackBtn.className = 'message-rollback-btn';
+                rollbackBtn.innerHTML = '↶';
+                rollbackBtn.title = 'Rollback to this point';
+                rollbackBtn.onclick = () => rollbackToMessage(messageDiv);
+                messageDiv.appendChild(rollbackBtn);
+                
+                messageDiv.appendChild(avatar);
+                messageDiv.appendChild(messageContent);
+            } else {
+                // Add rollback button for user messages
+                const rollbackBtn = document.createElement('button');
+                rollbackBtn.className = 'message-rollback-btn';
+                rollbackBtn.innerHTML = '↶';
+                rollbackBtn.title = 'Rollback to this point';
+                rollbackBtn.onclick = () => rollbackToMessage(messageDiv);
+                messageDiv.appendChild(rollbackBtn);
+                
+                messageDiv.appendChild(messageContent);
+                messageDiv.appendChild(avatar);
+            }
+            
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            
+            // Save snapshot after each message
+            saveConversationSnapshot(currentSpec);
+        }
+        
+        function renderFormPreview(spec) {
+            currentSpec = spec;
+            const previewContainer = document.getElementById('formPreview');
+            
+            if (!spec || !spec.fields || spec.fields.length === 0) {
+                previewContainer.innerHTML = `
+                    <div class="preview-empty">
+                        <div class="preview-icon">📝</div>
+                        <p>Your form preview will appear here as you chat with the AI.</p>
+                        <p>Start describing your form to see it take shape!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let formTitle = spec.doctype_name || spec.name || 'Untitled Form';
+            
+            let html = `
+                <div style="margin-bottom: 2rem;">
+                    <h3 style="margin: 0 0 0.5rem 0; color: #111827; font-size: 1.25rem; font-weight: 600;">
+                        ${formTitle}
+                    </h3>
+                    ${spec.description ? `<p style="margin: 0; color: #6b7280; font-size: 0.875rem;">${spec.description}</p>` : ''}
+                </div>
+            `;
+            
+            spec.fields.forEach(field => {
+                html += renderFieldPreview(field);
+            });
+            
+            previewContainer.innerHTML = html;
+        }
+        
+        function renderFieldPreview(field) {
+            const fieldType = field.fieldtype || 'Data';
+            const label = field.label || field.fieldname || 'Untitled Field';
+            const required = field.mandatory ? 'required' : '';
+            const placeholder = field.placeholder || `Enter ${label.toLowerCase()}`;
+            const options = field.options || '';
+            
+            let inputHtml = '';
+            
+            switch (fieldType.toLowerCase()) {
+                case 'data':
+                case 'text':
+                    inputHtml = `<input type="text" class="field-input" placeholder="${placeholder}" ${required}>`;
+                    break;
+                    
+                case 'email':
+                    inputHtml = `<input type="email" class="field-input" placeholder="${placeholder || 'Enter email address'}" ${required}>`;
+                    break;
+                    
+                case 'phone':
+                case 'phone number':
+                    inputHtml = `<input type="tel" class="field-input" placeholder="${placeholder || 'Enter phone number'}" ${required}>`;
+                    break;
+                    
+                case 'url':
+                    inputHtml = `<input type="url" class="field-input" placeholder="${placeholder || 'Enter URL'}" ${required}>`;
+                    break;
+                    
+                case 'password':
+                    inputHtml = `<input type="password" class="field-input" placeholder="${placeholder || 'Enter password'}" ${required}>`;
+                    break;
+                    
+                case 'int':
+                case 'float':
+                case 'currency':
+                    inputHtml = `<input type="number" class="field-input" placeholder="${placeholder}" ${required}>`;
+                    break;
+                    
+                case 'rating':
+                case 'rate':
+                    const maxRating = field.options ? parseInt(field.options) : 5;
+                    const stars = Array.from({length: maxRating}, (_, i) => 
+                        `<span class="star" data-rating="${i + 1}" style="cursor: pointer; font-size: 1.5rem; color: #d1d5db;">☆</span>`
+                    ).join('');
+                    inputHtml = `<div class="rating-stars" style="display: flex; gap: 0.25rem;">${stars}</div>`;
+                    break;
+                    
+                case 'radio':
+                    const radioOptions = options.split('\n').map((opt, index) => 
+                        `<label style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; cursor: pointer;">
+                            <input type="radio" name="${field.fieldname || 'radio_' + index}" value="${opt.trim()}" ${required}>
+                            <span style="font-size: 0.875rem; color: #374151;">${opt.trim()}</span>
+                        </label>`
+                    ).join('');
+                    inputHtml = `<div style="display: flex; flex-direction: column;">${radioOptions}</div>`;
+                    break;
+                    
+                case 'date':
+                    inputHtml = `<input type="date" class="field-input" ${required}>`;
+                    break;
+                    
+                case 'datetime':
+                    inputHtml = `<input type="datetime-local" class="field-input" ${required}>`;
+                    break;
+                    
+                case 'time':
+                    inputHtml = `<input type="time" class="field-input" ${required}>`;
+                    break;
+                    
+                case 'textarea':
+                case 'long text':
+                case 'text editor':
+                    inputHtml = `<textarea class="field-input field-textarea" placeholder="${placeholder}" ${required}></textarea>`;
+                    break;
+                    
+                case 'select':
+                case 'dropdown':
+                    const optionList = options.split('\n').map(opt => 
+                        `<option value="${opt.trim()}">${opt.trim()}</option>`
+                    ).join('');
+                    inputHtml = `<select class="field-input field-select" ${required}>
+                        <option value="">Select ${label.toLowerCase()}</option>
+                        ${optionList}
+                    </select>`;
+                    break;
+                    
+                case 'multiselect':
+                case 'multiple select':
+                    const multiOptions = options.split('\n').map(opt => 
+                        `<option value="${opt.trim()}">${opt.trim()}</option>`
+                    ).join('');
+                    inputHtml = `<select class="field-input field-select" multiple style="min-height: 100px;" ${required}>
+                        ${multiOptions}
+                    </select>`;
+                    break;
+                    
+                case 'check':
+                case 'checkbox':
+                    inputHtml = `<label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" ${required}>
+                        <span style="font-size: 0.875rem; color: #374151;">${label}</span>
+                    </label>`;
+                    break;
+                    
+                case 'link':
+                    inputHtml = `<input type="text" class="field-input" placeholder="Search ${options || 'records'}..." ${required}>`;
+                    break;
+                    
+                case 'attach':
+                case 'attach image':
+                case 'attachment':
+                    inputHtml = `<input type="file" class="field-input" ${required}>`;
+                    break;
+                    
+                case 'color':
+                    inputHtml = `<input type="color" class="field-input" ${required}>`;
+                    break;
+                    
+                case 'percentage':
+                case 'percent':
+                    inputHtml = `<div style="display: flex; align-items: center;">
+                        <input type="number" class="field-input" placeholder="${placeholder}" min="0" max="100" ${required} style="flex: 1;">
+                        <span style="margin-left: 0.5rem; color: #6b7280; font-weight: 500;">%</span>
+                    </div>`;
+                    break;
+                    
+                case 'currency amount':
+                case 'money':
+                    const currencySymbol = field.currency || '$';
+                    inputHtml = `<div style="display: flex; align-items: center;">
+                        <span style="margin-right: 0.5rem; color: #6b7280; font-weight: 500;">${currencySymbol}</span>
+                        <input type="number" class="field-input" placeholder="${placeholder}" step="0.01" ${required} style="flex: 1;">
+                    </div>`;
+                    break;
+                    
+                case 'duration':
+                case 'time span':
+                    inputHtml = `<div style="display: flex; gap: 0.5rem; align-items: center;">
+                        <input type="number" class="field-input" placeholder="Hours" min="0" style="flex: 1;" ${required}>
+                        <span style="color: #6b7280; font-size: 0.875rem;">hrs</span>
+                        <input type="number" class="field-input" placeholder="Minutes" min="0" max="59" style="flex: 1;" ${required}>
+                        <span style="color: #6b7280; font-size: 0.875rem;">mins</span>
+                    </div>`;
+                    break;
+                    
+                case 'date range':
+                    inputHtml = `<div style="display: flex; gap: 0.5rem; align-items: center;">
+                        <input type="date" class="field-input" placeholder="Start date" ${required} style="flex: 1;">
+                        <span style="color: #6b7280; font-size: 0.875rem;">to</span>
+                        <input type="date" class="field-input" placeholder="End date" ${required} style="flex: 1;">
+                    </div>`;
+                    break;
+                    
+                case 'address':
+                case 'location':
+                    inputHtml = `<div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <input type="text" class="field-input" placeholder="Street Address" ${required}>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <input type="text" class="field-input" placeholder="City" style="flex: 1;" ${required}>
+                            <input type="text" class="field-input" placeholder="State/Province" style="flex: 1;" ${required}>
+                            <input type="text" class="field-input" placeholder="ZIP/Postal Code" style="flex: 1;" ${required}>
+                        </div>
+                        <select class="field-input field-select" ${required}>
+                            <option value="">Select Country</option>
+                            <option value="US">United States</option>
+                            <option value="CA">Canada</option>
+                            <option value="UK">United Kingdom</option>
+                            <option value="AU">Australia</option>
+                            <option value="DE">Germany</option>
+                            <option value="FR">France</option>
+                            <option value="JP">Japan</option>
+                            <option value="IN">India</option>
+                        </select>
+                    </div>`;
+                    break;
+                    
+                case 'geolocation':
+                case 'coordinates':
+                    inputHtml = `<div style="display: flex; gap: 0.5rem; align-items: center;">
+                        <input type="number" class="field-input" placeholder="Latitude" step="0.000001" ${required} style="flex: 1;">
+                        <input type="number" class="field-input" placeholder="Longitude" step="0.000001" ${required} style="flex: 1;">
+                        <button type="button" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.75rem;" onclick="getCurrentLocation(this)">📍 Get Location</button>
+                    </div>`;
+                    break;
+                    
+                case 'signature':
+                    inputHtml = `<div style="border: 2px dashed #d1d5db; border-radius: 8px; padding: 2rem; text-align: center; background: #f9fafb;">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">✍️</div>
+                        <p style="margin: 0; color: #6b7280; font-size: 0.875rem;">Click to sign digitally</p>
+                        <canvas id="signature-pad" width="300" height="150" style="border: 1px solid #e5e7eb; border-radius: 4px; margin-top: 1rem; display: none;"></canvas>
+                        <div style="margin-top: 0.5rem;">
+                            <button type="button" class="btn btn-primary" style="font-size: 0.75rem; padding: 0.25rem 0.75rem;" onclick="clearSignature(this)">Clear</button>
+                        </div>
+                    </div>`;
+                    break;
+                    
+                case 'json':
+                case 'code':
+                    inputHtml = `<textarea class="field-input field-textarea" placeholder='{"key": "value"}' style="font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace; font-size: 0.8rem;" ${required}></textarea>`;
+                    break;
+                    
+                case 'markdown':
+                case 'rich text':
+                    inputHtml = `<div style="border: 1px solid #d1d5db; border-radius: 6px; padding: 0.75rem; background: white; min-height: 120px;" contenteditable="true" placeholder="${placeholder}" ${required ? 'required' : ''}></div>`;
+                    break;
+                    
+                case 'table':
+                case 'grid':
+                    const columns = options ? options.split(',').map(col => col.trim()) : ['Column 1', 'Column 2', 'Column 3'];
+                    const tableHtml = `
+                        <div style="border: 1px solid #d1d5db; border-radius: 6px; overflow: hidden;">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <thead>
+                                    <tr style="background: #f9fafb;">
+                                        ${columns.map(col => `<th style="padding: 0.75rem; text-align: left; border-bottom: 1px solid #e5e7eb; font-weight: 600; color: #374151;">${col}</th>`).join('')}
+                                        <th style="padding: 0.75rem; width: 50px;"><button type="button" onclick="addTableRow(this)" style="font-size: 0.75rem; padding: 0.25rem;">+</button></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        ${columns.map(() => `<td style="padding: 0.75rem; border-bottom: 1px solid #f3f4f6;"><input type="text" style="width: 100%; border: none; outline: none; background: transparent;"></td>`).join('')}
+                                        <td style="padding: 0.75rem; text-align: center;"><button type="button" onclick="removeTableRow(this)" style="font-size: 0.75rem; color: #ef4444;">×</button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                    inputHtml = tableHtml;
+                    break;
+                    
+                case 'timezone':
+                    inputHtml = `<select class="field-input field-select" ${required}>
+                        <option value="">Select Timezone</option>
+                        <option value="UTC">UTC</option>
+                        <option value="America/New_York">Eastern Time</option>
+                        <option value="America/Chicago">Central Time</option>
+                        <option value="America/Denver">Mountain Time</option>
+                        <option value="America/Los_Angeles">Pacific Time</option>
+                        <option value="Europe/London">London</option>
+                        <option value="Europe/Paris">Paris</option>
+                        <option value="Asia/Tokyo">Tokyo</option>
+                        <option value="Asia/Shanghai">Shanghai</option>
+                        <option value="Australia/Sydney">Sydney</option>
+                    </select>`;
+                    break;
+                    
+                case 'language':
+                    inputHtml = `<select class="field-input field-select" ${required}>
+                        <option value="">Select Language</option>
+                        <option value="en">English</option>
+                        <option value="es">Spanish</option>
+                        <option value="fr">French</option>
+                        <option value="de">German</option>
+                        <option value="it">Italian</option>
+                        <option value="pt">Portuguese</option>
+                        <option value="ru">Russian</option>
+                        <option value="ja">Japanese</option>
+                        <option value="ko">Korean</option>
+                        <option value="zh">Chinese</option>
+                        <option value="ar">Arabic</option>
+                        <option value="hi">Hindi</option>
+                    </select>`;
+                    break;
+                    
+                default:
+                    inputHtml = `<input type="text" class="field-input" placeholder="${placeholder}" ${required}>`;
+            }
+            
+            return `
+                <div class="form-preview-field ${required ? 'required' : ''}">
+                    ${['check', 'checkbox', 'radio', 'address', 'location', 'geolocation', 'coordinates', 'signature', 'table', 'grid'].includes(fieldType.toLowerCase()) ? '' : `<label class="field-label">${label}</label>`}
+                    ${inputHtml}
+                    ${field.description ? `<small style="color: #6b7280; font-size: 0.75rem; margin-top: 0.5rem; display: block;">${field.description}</small>` : ''}
+                </div>
+            `;
+        }
+        
+        async function sendMessage() {
+            const input = document.getElementById('userInput');
+            const message = input.value.trim();
+            
+            if (!message || !sessionId) return;
+            
+            // Hide prompts section on first message
+            document.body.classList.add('prompts-hidden');
+            
+            // Add user message
+            addMessage('user', message);
+            input.value = '';
+            
+            // Show loading
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('sendBtn').disabled = true;
+            
+            try {
+                const response = await fetch('/api/method/frappe_ai_form_builder.api.session.send_message', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Frappe-CSRF-Token': csrfToken
+                    },
+                    body: JSON.stringify({
+                        session_id: sessionId,
+                        message: message
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.message) {
+                    const result = data.message;
+                    addMessage('ai', result.message, result.draft_spec);
+                    
+                    if (result.ready_to_generate) {
+                        readyToGenerate = true;
+                        document.getElementById('generateBtn').style.display = 'block';
+                    }
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                addMessage('ai', '❌ Sorry, something went wrong. Please try again.');
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('sendBtn').disabled = false;
+            }
+        }
+        
+        async function generateDocType() {
+            if (!readyToGenerate || !sessionId) return;
+            
+            document.getElementById('generateBtn').disabled = true;
+            document.getElementById('generateBtn').textContent = 'Creating...';
+            
+            try {
+                const response = await fetch('/api/method/frappe_ai_form_builder.api.generator.generate_doctype', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Frappe-CSRF-Token': csrfToken
+                    },
+                    body: JSON.stringify({
+                        session_id: sessionId,
+                        publish: false
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.message) {
+                    const result = data.message;
+                    const successMsg = `
+                        <div class="success-message">
+                            <strong>✅ Form Created Successfully!</strong><br><br>
+                            <strong>Name:</strong> ${result.doctype_name}<br>
+                            <strong>Module:</strong> ${result.module}<br>
+                            <strong>Status:</strong> ${result.status}<br><br>
+                            <em style="color: #6b7280;">Your form has been submitted for admin approval. Once approved, it will be available for use.</em><br><br>
+                            <button class="btn btn-primary" onclick="createNewForm()" style="margin-top: 1rem;">
+                                <i class="fas fa-plus"></i> Create New Form
+                            </button>
+                        </div>
+                    `;
+                    addMessage('ai', successMsg);
+                    document.getElementById('generateBtn').style.display = 'none';
+                    
+                    // Clear the preview after successful creation
+                    renderFormPreview(null);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                addMessage('ai', '❌ Failed to create form. Please try again.');
+            } finally {
+                document.getElementById('generateBtn').disabled = false;
+                document.getElementById('generateBtn').textContent = '✨ Create Form';
+            }
+        }
+    </script>
+</body>
+</html>

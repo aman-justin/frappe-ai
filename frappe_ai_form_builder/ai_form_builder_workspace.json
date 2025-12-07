@@ -1,0 +1,98 @@
+{
+ "charts": [],
+ "content": "[{\"id\":\"vvQUpQkXIz\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>AI Form Builder</b></span>\",\"col\":12}},{\"id\":\"rA3UaZSEg3\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"AI Conversation\",\"col\":3}},{\"id\":\"Ks6ZF4V7vH\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"AI Generated Artifact\",\"col\":3}},{\"id\":\"2gKf8HnPqL\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"AI Config\",\"col\":3}},{\"id\":\"9mWx5RtNcB\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"AI Audit Log\",\"col\":3}},{\"id\":\"kPzXwYhJ2M\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h5\\\">Quick Access</span>\",\"col\":12}},{\"id\":\"jQ4BvNxL8T\",\"type\":\"card\",\"data\":{\"card_name\":\"Getting Started\",\"col\":4}}]",
+ "creation": "2025-12-05 21:30:00.000000",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "octicon octicon-hubot",
+ "idx": 0,
+ "is_hidden": 0,
+ "label": "AI Form Builder",
+ "links": [
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "AI Conversation",
+   "link_count": 0,
+   "link_to": "AI Conversation",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "AI Generated Artifact",
+   "link_count": 0,
+   "link_to": "AI Generated Artifact",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "AI Config",
+   "link_count": 0,
+   "link_to": "AI Config",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "AI Audit Log",
+   "link_count": 0,
+   "link_to": "AI Audit Log",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2025-12-05 21:30:00.000000",
+ "modified_by": "Administrator",
+ "module": "Frappe AI Form Builder",
+ "name": "AI Form Builder",
+ "number_cards": [],
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [],
+ "sequence_id": 10,
+ "shortcuts": [
+  {
+   "color": "Blue",
+   "format": "{}",
+   "label": "AI Conversation",
+   "link_to": "AI Conversation",
+   "type": "DocType"
+  },
+  {
+   "color": "Green",
+   "format": "{}",
+   "label": "AI Generated Artifact",
+   "link_to": "AI Generated Artifact",
+   "type": "DocType"
+  },
+  {
+   "color": "Purple",
+   "format": "{}",
+   "label": "AI Config",
+   "link_to": "AI Config",
+   "type": "DocType"
+  },
+  {
+   "color": "Orange",
+   "format": "{}",
+   "label": "AI Audit Log",
+   "link_to": "AI Audit Log",
+   "type": "DocType"
+  }
+ ],
+ "title": "AI Form Builder"
+}

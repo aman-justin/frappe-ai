@@ -1,0 +1,157 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-12-05 10:00:00",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "action",
+  "action",
+  "artifact_id",
+  "artifact_id",
+  "artifact_name",
+  "artifact_name",
+  "actor",
+  "actor",
+  "reason",
+  "reason",
+  "timestamp",
+  "timestamp"
+ ],
+ "fields": [
+  {
+   "fieldname": "action",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Action",
+   "options": "generate\ndraft\napproved\nrejected\nrollback",
+   "reqd": 1
+  },
+  {
+   "fieldname": "artifact_id",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Artifact ID",
+   "options": "AI Generated Artifact"
+  },
+  {
+   "fieldname": "artifact_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Artifact Name"
+  },
+  {
+   "fieldname": "actor",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Actor",
+   "options": "User",
+   "reqd": 1
+  },
+  {
+   "fieldname": "reason",
+   "fieldtype": "Text",
+   "label": "Reason"
+  },
+  {
+   "default": "Now",
+   "fieldname": "timestamp",
+   "fieldtype": "Datetime",
+   "label": "Timestamp",
+   "reqd": 1
+  },
+  {
+   "fieldname": "action",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Action",
+   "options": "generate\ndraft\napproved\nrejected\nrollback",
+   "reqd": 1
+  },
+  {
+   "fieldname": "artifact_id",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Artifact ID",
+   "options": "AI Generated Artifact"
+  },
+  {
+   "fieldname": "artifact_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Artifact Name"
+  },
+  {
+   "fieldname": "actor",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Actor",
+   "options": "User",
+   "reqd": 1
+  },
+  {
+   "fieldname": "reason",
+   "fieldtype": "Text",
+   "label": "Reason"
+  },
+  {
+   "default": "Now",
+   "fieldname": "timestamp",
+   "fieldtype": "Datetime",
+   "label": "Timestamp",
+   "reqd": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-12-05 22:25:56.451959",
+ "modified_by": "Administrator",
+ "module": "ai_audit_log",
+ "name": "AI Audit Log",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "read": 1,
+   "role": "Guest"
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Guest",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

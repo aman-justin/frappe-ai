@@ -1,0 +1,73 @@
+{
+ "doctype": "DocType",
+ "name": "Form Submissions",
+ "module": "ai_generated_artifact",
+ "custom": 0,
+ "fields": [
+  {
+   "fieldname": "form_name",
+   "fieldtype": "Data",
+   "label": "Form Name",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "form_type",
+   "fieldtype": "Link",
+   "label": "Form Type",
+   "options": "DocType",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "submitted_by",
+   "fieldtype": "Data",
+   "label": "Submitted By",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "submission_date",
+   "fieldtype": "Datetime",
+   "label": "Submission Date",
+   "default": "Now",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "submission_data",
+   "fieldtype": "Text",
+   "label": "Submission Data (JSON)",
+   "reqd": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "New\nReviewed\nProcessed",
+   "default": "New",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "ip_address",
+   "fieldtype": "Data",
+   "label": "IP Address"
+  },
+  {
+   "fieldname": "user_agent",
+   "fieldtype": "Text",
+   "label": "User Agent"
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1
+  }
+ ],
+ "has_web_view": 0,
+ "is_submittable": 0,
+ "sort_field": "submission_date",
+ "sort_order": "DESC"
+}
