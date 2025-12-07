@@ -13,7 +13,7 @@ services:
     volumes:
       - mariadb-data:/var/lib/mysql
     ports:
-      - "3306:3306"
+      - "3307:3306"  # Changed from 3306 to 3307 to avoid conflict
     networks:
       - frappe-network
     healthcheck:
@@ -21,6 +21,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
   # Redis Cache
   redis-cache:
@@ -33,6 +34,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
   # Redis Queue
   redis-queue:
@@ -45,6 +47,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
   # Frappe Bench
   frappe:
@@ -52,7 +55,7 @@ services:
     container_name: frappe-ai-bench
     working_dir: /home/frappe/frappe-bench
     volumes:
-      - ./../../:/home/frappe/frappe-bench
+      - ../../:/home/frappe/frappe-bench
     ports:
       - "8000:8000"
       - "9000:9000"
@@ -67,6 +70,7 @@ services:
         condition: service_healthy
     stdin_open: true
     tty: true
+    restart: unless-stopped
     command: bash
 
 volumes:
