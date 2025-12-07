@@ -38,7 +38,34 @@ AI-powered form and template generator for Frappe Framework. Enables non-technic
 
 ## 🚀 Quick Start (TL;DR)
 
-### Option 1: Docker (Easiest - Recommended for Beginners)
+> **⚠️ Note**: Docker setup is not ready yet. Please use the manual setup below.
+
+### Manual Setup (Currently Working ✅)
+
+**Prerequisites**: Python 3.12, Node.js, MariaDB/MySQL, Redis
+
+```bash
+# 1. Install Frappe Bench
+pip install frappe-bench
+
+# 2. Initialize bench and install Frappe
+bench init frappe-bench --frappe-branch version-15
+cd frappe-bench
+
+# 3. Get the AI Form Builder app
+bench get-app https://github.com/aman-justin/frappe-ai.git
+
+# 4. Create a new site
+bench new-site dev.local
+
+# 5. Install and start
+bench --site dev.local install-app frappe_ai_form_builder
+bench start
+```
+
+Visit `http://dev.local:8000/app/ai-form-builder` and start chatting with AI!
+
+### Option 2: Docker (In Progress 🔄)
 
 **Prerequisites**: Install [Docker Desktop](https://www.docker.com/products/docker-desktop)
 
@@ -47,24 +74,19 @@ AI-powered form and template generator for Frappe Framework. Enables non-technic
 git clone https://github.com/aman-justin/frappe-ai.git
 cd frappe-ai/apps/frappe_ai_form_builder
 
-# 2. Start with Docker (one command!)
-docker-compose up -d
+# 2. Start with Docker (work in progress)
+docker compose up -d
 
-# 3. Setup site (wait 30 seconds after step 2)
-docker exec -it frappe-ai-bench bench new-site dev.local --mariadb-root-password admin --admin-password admin --db-host mariadb
-docker exec -it frappe-ai-bench bench --site dev.local install-app frappe_ai_form_builder
-docker exec -it frappe-ai-bench bench --site dev.local serve --port 8000
-
-# Open http://localhost:8000 (Login: Administrator / admin)
+# 3. Access the application
 ```
 
-📖 **[Full Docker Setup Guide](DOCKER_SETUP.md)** - Detailed instructions and troubleshooting
+> **⚠️ Docker Note**: Docker setup is currently under development and not ready for use. Please follow the manual setup instructions below.
 
 ---
 
-### Option 2: Manual Setup (For Developers)
+### Using This Pre-Configured Repository
 
-This is a **complete Frappe bench** with AI Form Builder pre-installed!
+This repository contains a **complete Frappe bench** with AI Form Builder pre-installed!
 
 ```bash
 # 1. Clone the repository
