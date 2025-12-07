@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  # MariaDB Database
+  mariadb:
+    image: mariadb:10.6
+    container_name: frappe-ai-mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: frappe
+      MYSQL_USER: frappe
+      MYSQL_PASSWORD: frappe
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - frappe-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis-cache:
+    image: redis:7-alpine
+    container_name: frappe-ai-redis-cache
+    networks:
+      - frappe-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Queue
+  redis-queue:
+    image: redis:7-alpine
+    container_name: frappe-ai-redis-queue
+    networks:
+      - frappe-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Frappe Bench
+  frappe:
+    image: frappe/bench:latest
+    container_name: frappe-ai-bench
+    working_dir: /home/frappe/frappe-bench
+    volumes:
+      - ./../../:/home/frappe/frappe-bench
+    ports:
+      - "8000:8000"
+      - "9000:9000"
+    networks:
+      - frappe-network
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      redis-cache:
+        condition: service_healthy
+      redis-queue:
+        condition: service_healthy
+    stdin_open: true
+    tty: true
+    command: bash
+
+volumes:
+  mariadb-data:
+
+networks:
+  frappe-network:
+    driver: bridge

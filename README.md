@@ -4,6 +4,27 @@
 
 AI-powered form and template generator for Frappe Framework. Enables non-technical users to create DocTypes (forms) through conversational AI.
 
+## 🎥 Demo
+
+> **Video coming soon!** Watch a 2-minute walkthrough of creating forms with AI.
+
+<!-- Uncomment when video is ready:
+[![AI Form Builder Demo](https://img.youtube.com/vi/YOUR_VIDEO_ID/maxresdefault.jpg)](https://www.youtube.com/watch?v=YOUR_VIDEO_ID)
+-->
+
+### Screenshots
+
+![AI Form Builder Interface](https://via.placeholder.com/800x400/4A90E2/ffffff?text=AI+Form+Builder+Interface)
+*Conversational interface with live preview*
+
+![Live Form Preview](https://via.placeholder.com/800x400/7B68EE/ffffff?text=Real-Time+Form+Preview)
+*See your form being built in real-time*
+
+![Admin Approval](https://via.placeholder.com/800x400/50C878/ffffff?text=Admin+Approval+System)
+*Review and approve AI-generated forms*
+
+---
+
 ## Features
 
 - 🤖 **Conversational AI Interface**: Chat with AI to describe your form requirements
@@ -12,8 +33,36 @@ AI-powered form and template generator for Frappe Framework. Enables non-technic
 - ✅ **Admin Review System**: Approve or reject AI-generated artifacts before deployment
 - 🔒 **Security & Validation**: Built-in safety checks for AI-generated code
 - 📊 **Audit Logs**: Track all AI generations and approvals
+- 🔄 **Rollback Feature**: Undo changes and experiment freely
+- 🧹 **Clear Chat**: Start fresh conversations anytime
 
 ## 🚀 Quick Start (TL;DR)
+
+### Option 1: Docker (Easiest - Recommended for Beginners)
+
+**Prerequisites**: Install [Docker Desktop](https://www.docker.com/products/docker-desktop)
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/aman-justin/frappe-ai.git
+cd frappe-ai/apps/frappe_ai_form_builder
+
+# 2. Start with Docker (one command!)
+docker-compose up -d
+
+# 3. Setup site (wait 30 seconds after step 2)
+docker exec -it frappe-ai-bench bench new-site dev.local --mariadb-root-password admin --admin-password admin --db-host mariadb
+docker exec -it frappe-ai-bench bench --site dev.local install-app frappe_ai_form_builder
+docker exec -it frappe-ai-bench bench --site dev.local serve --port 8000
+
+# Open http://localhost:8000 (Login: Administrator / admin)
+```
+
+📖 **[Full Docker Setup Guide](DOCKER_SETUP.md)** - Detailed instructions and troubleshooting
+
+---
+
+### Option 2: Manual Setup (For Developers)
 
 This is a **complete Frappe bench** with AI Form Builder pre-installed!
 
